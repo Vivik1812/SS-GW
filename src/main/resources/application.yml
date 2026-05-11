@@ -16,7 +16,7 @@ spring:
 
             #OAuh2
             - id: usuarios-oauth2
-              uri: ${USUARIOS_SERVICE_URL:http://usuario-service:8080}
+              uri: ${USUARIOS_SERVICE_URL:http://usuarios-service:8080}
               predicates:
                 - Path=/oauth2/**,/login/**
 
