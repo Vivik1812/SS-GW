@@ -1,23 +1,26 @@
-FROM eclipse-temurin:25-jdk-alpine AS builder
+FROM eclipse-temurin:21-jdk-alpine AS builder
 
 WORKDIR /app
 
-COPY .mvn/ .mvn/
-COPY .mvnw/ .mvnw/ 
+COPY mvnw mvnw
+COPY .mvn .mvn
 COPY pom.xml ./
-RUN .chmod +x mvnw
 
-COPY src/ ./src/
-RUN ./mvnw  -DskipTests package
+RUN sed -i 's/\r$//' mvnw && chmod +x mvnw
 
-FROM eclipse-temurin:25-jre-alpine
+COPY src src
+
+RUN ./mvnw clean package -DskipTests
+
+FROM eclipse-temurin:21-jre-alpine
 
 WORKDIR /app
 
-RUN groupadd --system app && useradd --system --gid app --create-home --home-dir /home/app app
-COPY --from=builder /app/target/*.jar app.jar
+RUN addgroup -S app && adduser -S app -G app
+
+COPY --from=builder --chown=app /app/target/*.jar app.jar
+
 USER app
 
-EXPOSE 8080
-
-ENTRYPOINT ["java", "-jar", "app.jar"]
+EXPOSE 9000
+ENTRYPOINT [ "java", "-jar", "/app/app.jar" ]
