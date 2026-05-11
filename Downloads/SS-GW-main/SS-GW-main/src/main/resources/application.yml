@@ -1,0 +1,82 @@
+#package  com.gateway.api_gateway;
+
+#import org.springframework.boot.SpringApplication;
+#import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+#@SpringBootApplication
+#public class ApiGatewayApplication {
+
+#  public static void main(String[] args) {
+#    SpringApplication.run(ApiGatewayApplication.class, args);
+#  }
+#}
+
+
+spring:
+  application:
+    name: ss-api-gateway
+
+  #valid tokens
+  security:
+  oauth2:
+    resourceserver:
+      jwt:
+        issuer-uri: http://localhost:8080/realms/master
+        jwk-set-uri: http://localhost:8080/realms/master/protocol/openid-connect/certs
+  
+  cloud:
+    gateway:
+      server:
+       webmvc:
+        routes:
+          #usuarios
+          - id: ss-usuarios
+            uri: ${USUARIOS_SERVICE_URL:http://ss-usuarios:8081}
+            predicates:
+              - Path=/usuarios/**
+            filters:
+              - StripPrefix=1
+
+
+          #publicaciones
+          - id: ss-publicaciones
+            uri: ${PUBLICACIONES_SERVICE_URL:http://ss-publicaciones:8082}
+            predicates:
+              - Path=/publicaciones/**
+            filters:
+              - StripPrefix=1
+
+
+          #notificaciones
+          - id: ss-notificaciones
+            uri: ${NOTIFICACIONES_SERVICE_URL:http://ss-notificaciones:8083}
+            predicates:
+              - Path=/notificaciones/**
+            filters:
+              - StripPrefix=1
+
+          #chat
+          - id: ss-chat
+            uri: ${CHAT_SERVICE_URL:http://ss-chat:8084}
+            predicates:
+              - Path=/chat/**
+            filters:
+              - StripPrefix=1
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
+#logging
+logging:
+  level:
+    org.springframework.cloud.gateway: INFO
+    org.springframework.web: INFO
+
+
+

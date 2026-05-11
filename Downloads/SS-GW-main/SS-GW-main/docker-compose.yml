@@ -1,0 +1,110 @@
+services:
+  api-gateway:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    enviroment:
+      -JWT_USER: 
+      - USUARIOS_SERVICE_URL:
+      - PUBLICACIONES_SERVICE_URL:
+      - NOTIFICACIONES_SERVICE_URL:
+      - CHAT_SERVICE_URL:
+    depends_on:
+      - ss-usuario
+      - ss-publicaciones
+      - ss-notificaciones
+      - ss-chat
+    networks: [ss-net]
+    restart: unless-stopped
+
+  ss-usuario:
+    build: 
+      context: ./ss-usuario
+    expose: [8081:8081]
+    enviroment: 
+      SERVER_PORT: 
+      SPRING_DATASOURCE_URL:
+      SPRING_DATASOURCE_USERNAME:
+      SPRING_DATASOURCE_PASSWORD:
+    depends_on: [db-usuario]
+    networks: [ss-net]
+    restart: unless-stopped
+
+  ss-publicaciones:
+    build: 
+      context: ./ss-publicaciones
+    expose: [8082:8082]
+    enviroment: 
+      SERVER_PORT: 
+      SPRING_DATASOURCE_URL:
+      SPRING_DATASOURCE_USERNAME:
+      SPRING_DATASOURCE_PASSWORD:
+    depends_on: [db-publicaciones]
+    networks: [ss-net]
+    restart: unless-stopped
+
+  ss-notificaciones:
+    build: 
+      context: ./ss-notificaciones
+    expose: [8083:8083]
+    enviroment: 
+      SERVER_PORT: 
+      SPRING_RABBITMQ_HOST:
+      SPRING_RABBITMQ_PORT:
+      SPRING_RABBITMQ_USERNAME:
+      SPRING_RABBITMQ_PASSWORD:
+    depends_on: [db-notificaciones]
+    networks: [ss-net]
+    restart: unless-stopped
+
+  ss-chat:
+    build:  
+      context: ./ss-chat
+    expose: [8084:8084]
+    enviroment: 
+      SERVER_PORT: 
+    networks: [ss-net]
+    restart: unless-stopped
+
+  db-usuario:
+    image: mysql:8.0
+    enviroment:
+      POSTGRES_DB: ss_usuario
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      volumes:
+        - db-usuario-data:/var/lib/mysql  
+    expose: [] ##aqui falta
+    networks: [ss-net]
+
+  db-publicaciones:
+    image: mysql:8.0
+    environment:
+      - POSTGRESS_DB: ss_publicaciones
+      - POSTGRES_USER: root
+      - POSTGRESS_PASSWORD: ${DB_PASSWORD:-postgres}
+    volumes:
+      - db-publicaciones-data:/var/lib/mysql
+    expose: [] ##aqui falta
+    networks: [ss-net]
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672" ##revisar
+      - "15672:15672" #revisar
+    expose: []  ##aqui falta
+    networks: [ss-net]
+
+volumes:
+  db-usuario-data:
+  db-publicaciones-data:
+  db-notificaciones-data:
+  db-chat-data:
+
+networks:
+  ss-net:
+    driver: bridge
