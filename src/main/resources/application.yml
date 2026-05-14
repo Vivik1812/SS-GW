@@ -7,20 +7,32 @@ spring:
 
   cloud:
     gateway:
-          routes:
-            #Usuarios
-            - id: usuarios-service
-              uri: ${USUARIOS_SERVICE_URL:http://usuarios-service:8080}
-              predicates:
-                - Path=/api/v1/usuarios/**
+      routes:
+        #Usuarios
+        - id: usuarios-service
+          uri: ${USUARIOS_SERVICE_URL:http://usuarios-service:8080}
+          predicates:
+            - Path=/api/v1/usuarios/**
 
-            #OAuh2
-            - id: usuarios-oauth2
-              uri: ${USUARIOS_SERVICE_URL:http://usuarios-service:8080}
-              predicates:
-                - Path=/oauth2/**,/login/**
+        #OAuh2
+        - id: usuarios-oauth2
+          uri: ${USUARIOS_SERVICE_URL:http://usuarios-service:8080}
+          predicates:
+            - Path=/oauth2/**,/login/**
 
-            - id: usuarios-oauth2-callback
-              uri: ${USUARIOS_SERVICE_URL:http://usuarios-service:8080}
-              predicates:
-                - Path=/login/oauth2/code/google
+        - id: usuarios-oauth2-callback
+          uri: ${USUARIOS_SERVICE_URL:http://usuarios-service:8080}
+          predicates:
+            - Path=/login/oauth2/code/google
+
+        #Notificaciones
+        - id: notificaciones-service
+          uri: ${NOTIFICACIONES_SERVICE_URL:http://notificaciones-service:8083}
+          predicates:
+            - Path=/api/v1/notificaciones/**
+
+        #Publicaciones
+        - id: publicaciones-service
+          uri: ${PUBLICACIONES_SERVICE_URL:http://publicaciones-service:8082}
+          predicates:
+            - Path=/api/v1/publicaciones/**
