@@ -1,6 +1,7 @@
 server:
   port: ${SERVER_PORT:9000}
-
+  forward-headers-strategy: framework
+  
 spring:
   application:
     name: api-gateway
