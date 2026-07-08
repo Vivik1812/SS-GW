@@ -55,3 +55,9 @@ spring:
           uri: ${PUBLICACIONES_SERVICE_URL:http://publicaciones-service:8082}
           predicates:
             - Path=/api/v1/publicaciones/**
+        
+        #Imagenes
+        - id: imagenes-service 
+          uri: ${PUBLICACIONES_SERVICE_URL:http://publicaciones-service:8082}
+          predicates:
+            - Path=/api/v1/imagenes/**
